@@ -1,87 +1,56 @@
 import { useState, useEffect } from 'react';
 import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 import firebase from './src/firebaseConnection';
-import List from './src/List';
 
 export default function App() {
 
-  const [name, setName] = useState('')
-  const [cargo, setCargo] = useState('')
-  const [users, setUsers] = useState([])
-
-  useEffect(() => {
-
-    async function dados(){
-      
-      await firebase.database().ref('usuarios').on('value', (snapshot) => {
-
-        setUsers([])
-
-        snapshot.forEach((childItem) => {
-          let data = {
-            key: childItem.key,
-            name: childItem.val().name,
-            cargo: childItem.val().cargo
-          }
-
-          setUsers(oldArray => [...oldArray, data])
-
-        })
-
-      })
-
-    }
-
-    dados()
-
-  }, [])
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   async function cadastrar(){
-    if(name !== '' & cargo !== ''){
-
-      let users = await firebase.database().ref('usuarios')
-      let keys = users.push().key
-
-      users.child(keys).set({
-        name: name,
-        cargo: cargo
+    await firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then((value) => {
+        alert('Usuario cadastrado com sucesso!')
       })
-
-      alert('cadastrado com sucesso!')
-      setCargo('')
-      setName('')
-
-    }
+      .catch((error) => {
+        if(error.code === 'auth/weak-password'){
+          alert('Sua senha deve ter pelo menos 6 digitos.')
+          return;
+        }
+        if (error.code === 'auth/invalid-email'){
+          alert('Email invalido')
+          return;
+        } else {
+          alert('Ops deu merda!')
+          return;
+        }
+      })
+    setEmail('')
+    setPassword('')
   }
 
   return (
     <View style={styles.container}>
 
-      <Text style={styles.text}>Nome</Text>
+      <Text style={styles.text}>Email</Text>
       <TextInput
         style={styles.input}
         underlineColorAndroid='transparent'
-        onChangeText={(text) => setName(text)}
-        value={name}
+        onChangeText={(text) => setEmail(text)}
+        value={email}
       />
 
-      <Text style={styles.text}>Cargo</Text>
+      <Text style={styles.text}>Senha</Text>
       <TextInput
         style={styles.input}
         underlineColorAndroid='transparent'
-        onChangeText={(text) => setCargo(text)}
-        value={cargo}
+        onChangeText={(text) => setPassword(text)}
+        value={password}
       />
 
       <Button 
         title='New'
         onPress={cadastrar}
-      />
-
-      <FlatList
-        keyExtractor={item => item.key}
-        data={users}
-        renderItem={ ({item}) => ( <List data={item} />)}
       />
 
     </View>
@@ -91,7 +60,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin:30,
+    marginVertical: 50,
+    marginHorizontal:20
   },
   text: {
     fontSize: 20
