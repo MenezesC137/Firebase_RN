@@ -1,12 +1,26 @@
+import { useState, useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-
 import firebase from './src/firebaseConnection';
-console.disableYellowBox = true;
 
 export default function App() {
+
+  const [name, setName] = useState('Loading...')
+
+  useEffect(() => {
+
+    async function dados(){
+      await firebase.database().ref('usuarios/1/nome').on('value', (snapshot) => {
+        setName(snapshot.val())
+      })
+    }
+
+    dados()
+
+  }, [])
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      <Text style={{fontSize: 25}}>Olá {name}</Text>
     </View>
   );
 }
