@@ -7,23 +7,14 @@ export default function App() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  async function cadastrar(){
-    await firebase.auth().createUserWithEmailAndPassword(email, password)
+  async function logar(){
+    await firebase.auth().signInWithEmailAndPassword(email, password)
       .then((value) => {
-        alert('Usuario cadastrado com sucesso!')
+        alert('Usuario logado com sucesso!')
       })
       .catch((error) => {
-        if(error.code === 'auth/weak-password'){
-          alert('Sua senha deve ter pelo menos 6 digitos.')
-          return;
-        }
-        if (error.code === 'auth/invalid-email'){
-          alert('Email invalido')
-          return;
-        } else {
-          alert('Ops deu merda!')
-          return;
-        }
+        alert('Ops deu merda!')
+        return;
       })
     setEmail('')
     setPassword('')
@@ -49,8 +40,8 @@ export default function App() {
       />
 
       <Button 
-        title='New'
-        onPress={cadastrar}
+        title='Entrar'
+        onPress={logar}
       />
 
     </View>
