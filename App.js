@@ -1,27 +1,34 @@
 import { useState, useEffect } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 import firebase from './src/firebaseConnection';
+import List from './src/List';
 
 export default function App() {
 
-  const [name, setName] = useState('Loading...')
+  const [name, setName] = useState('')
   const [cargo, setCargo] = useState('')
+  const [users, setUsers] = useState([])
 
   useEffect(() => {
 
     async function dados(){
       
-      //Criando
-      //await firebase.database().ref('tipo').set('Cliente');
+      await firebase.database().ref('usuarios').on('value', (snapshot) => {
 
-      //Removendo
-      //await firebase.database().ref('tipo').remove()
+        setUsers([])
 
-      // await firebase.database().ref('usuarios').child(3).set({
-      //   nome: 'Jose',
-      //   cargo: 'DEV'
-      // })
+        snapshot.forEach((childItem) => {
+          let data = {
+            key: childItem.key,
+            name: childItem.val().name,
+            cargo: childItem.val().cargo
+          }
 
+          setUsers(oldArray => [...oldArray, data])
+
+        })
+
+      })
 
     }
 
@@ -70,6 +77,13 @@ export default function App() {
         title='New'
         onPress={cadastrar}
       />
+
+      <FlatList
+        keyExtractor={item => item.key}
+        data={users}
+        renderItem={ ({item}) => ( <List data={item} />)}
+      />
+
     </View>
   );
 }
