@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FlatList, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import Login from "./src/components/login";
@@ -11,6 +11,36 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [newTask, setNewTask] = useState('')
   const [tasks, setTasks] = useState([])
+
+  useEffect(() => {
+
+    function getUser(){
+
+      if(!user){
+        return
+      }
+
+      firebase.database().ref('tasks').child(user).once('value', (snapshot) => {
+        setTasks([])
+
+        snapshot?.forEach((childItem) => {
+
+          let data ={
+            key: childItem.key,
+            name: childItem.val().name
+          }
+
+          setTasks(oldTasks => [...oldTasks, data])
+
+        })
+
+      })
+
+    }
+    
+    getUser()
+
+  },[user])
 
   function handleAdd(){
     if(newTask === ''){
@@ -32,7 +62,7 @@ export default function App() {
 
     Keyboard.dismiss()
     setNewTask('')
-    
+
   }
 
   function handleDelete(key){
