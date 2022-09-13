@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-export default function Login() {
+import firebase from "../../components/service/firebaseConnection"
+
+export default function Login({changeStatus}) {
 
   const [type, setType] = useState('login')
 
@@ -9,7 +11,25 @@ export default function Login() {
   const [password, setPassword] = useState('')
 
   function handleLogin(){
-    alert('teste')
+    
+    if (type === 'login'){
+      const user = firebase.auth().signInWithEmailAndPassword(email, password).then((res) => {
+        changeStatus(res.user.uid)
+      }).catch(err => {
+        console.log(err)
+        alert('Deu merda!!!')
+        return
+      })
+    } else {
+      const user = firebase.auth().createUserWithEmailAndPassword(email, password).then((res) => {
+        changeStatus(res.user.uid)
+      }).catch(err => {
+        console.log(err)
+        alert('Deu merda!!!')
+        return 
+      })
+    }
+
   }
 
   return(
