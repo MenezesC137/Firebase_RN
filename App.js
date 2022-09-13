@@ -1,69 +1,27 @@
-import { useState, useEffect } from 'react';
-import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
-import firebase from './src/firebaseConnection';
+import React, { useState } from "react";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+
+import Login from "./src/components/login";
 
 export default function App() {
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
 
-  async function logar(){
-    await firebase.auth().signInWithEmailAndPassword(email, password)
-      .then((value) => {
-        alert('Usuario logado com sucesso!')
-      })
-      .catch((error) => {
-        alert('Ops deu merda!')
-        return;
-      })
-    setEmail('')
-    setPassword('')
+  if(!user) {
+    return <Login />
   }
 
-  return (
-    <View style={styles.container}>
-
-      <Text style={styles.text}>Email</Text>
-      <TextInput
-        style={styles.input}
-        underlineColorAndroid='transparent'
-        onChangeText={(text) => setEmail(text)}
-        value={email}
-      />
-
-      <Text style={styles.text}>Senha</Text>
-      <TextInput
-        style={styles.input}
-        underlineColorAndroid='transparent'
-        onChangeText={(text) => setPassword(text)}
-        value={password}
-      />
-
-      <Button 
-        title='Entrar'
-        onPress={logar}
-      />
-
-    </View>
-  );
+  return(
+    <SafeAreaView style={styles.container}>
+      <Text>Dentro da tela de tarefas</Text>
+    </SafeAreaView>
+  )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container:{
     flex: 1,
-    marginVertical: 50,
-    marginHorizontal:20
-  },
-  text: {
-    fontSize: 20
-  },
-  input: {
-    marginBottom: 10,
-    padding: 10,
-    borderWidth:1,
-    borderColor: '#121212',
-    height: 45,
-    fontSize: 17
+    marginHorizontal:10,
+    marginVertical:50,
   }
-
-});
+})
