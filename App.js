@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FlatList, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import Login from "./src/components/login";
@@ -11,6 +11,8 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [newTask, setNewTask] = useState('')
   const [tasks, setTasks] = useState([])
+  const inputRef = useRef(null)
+  const [key, setKey] = useState('')
 
   useEffect(() => {
 
@@ -47,6 +49,23 @@ export default function App() {
       return
     }
 
+    if(key !== '') {
+      firebase.database().ref('tasks').child(user).child(key).update({
+        name: newTask
+      }).then(()=>{
+        const taskIndex = tasks.findIndex( item => item.key === key)
+        const taskClone = tasks
+        taskClone[taskIndex].name = newTask
+
+        setTasks([...taskClone])
+      })
+
+      Keyboard.dismiss()
+      setNewTask('')
+      setKey('')
+      return
+    }
+
     let tarefas = firebase.database().ref('tasks').child(user)
     let keys = tarefas.push().key
 
@@ -73,7 +92,11 @@ export default function App() {
   }
 
   function handleEdit(data){
-    console.log(data);
+    
+    setKey(data.key)
+    setNewTask(data.name)
+    inputRef.current.focus()
+
   }
 
   if(!user) {
@@ -89,6 +112,7 @@ export default function App() {
           placeholder='O que vai fazer hoje?'
           value={newTask}
           onChangeText={e => setNewTask(e)}
+          ref={inputRef}
         />
 
         <TouchableOpacity style={styles.buttonAdd} onPress={handleAdd}>
