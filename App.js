@@ -6,6 +6,8 @@ import TaskList from "./src/components/taskList"
 
 import firebase from "./src/components/service/firebaseConnection"
 
+import Feather from "react-native-vector-icons/Feather";
+
 export default function App() {
 
   const [user, setUser] = useState(null)
@@ -99,14 +101,31 @@ export default function App() {
 
   }
 
+  function cancelEdit(){
+    setKey('')
+    setNewTask('')
+    Keyboard.dismiss()
+  }
+
   if(!user) {
     return <Login changeStatus={(user) => setUser(user)}/>
   }
 
   return(
     <SafeAreaView style={styles.container}>
-      <View style={styles.task}>
 
+      { key.length > 0 && (
+        <View style={{ flexDirection: 'row', marginBottom: 10, alignItems: 'center'}}>
+          <TouchableOpacity onPress={cancelEdit}>
+            <Feather name='x-circle' size={20} color="#FF0000" />
+          </TouchableOpacity>
+          <Text style={{marginLeft: 5, color: '#FF0000'}}>
+            Você está editando uma tarefa!
+          </Text>
+        </View>
+      )}
+      
+      <View style={styles.task}>
         <TextInput
           style={styles.input}
           placeholder='O que vai fazer hoje?'
@@ -114,13 +133,10 @@ export default function App() {
           onChangeText={e => setNewTask(e)}
           ref={inputRef}
         />
-
         <TouchableOpacity style={styles.buttonAdd} onPress={handleAdd}>
           <Text style={{fontSize: 22}}>+</Text>
         </TouchableOpacity>
-
       </View>
-
       <FlatList
         data={tasks}
         keyExtractor={item => item.key}
@@ -128,8 +144,6 @@ export default function App() {
           <TaskList data={item} deleteItem={handleDelete} editItem={handleEdit} />
         )}
       />
-
-
     </SafeAreaView>
   )
 }
